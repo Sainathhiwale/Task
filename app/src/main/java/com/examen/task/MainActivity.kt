@@ -74,4 +74,5 @@ class MainActivity : AppCompatActivity() {
         binding.rvCar.adapter = CarAdapter(carList)
 
     }
+
 }
