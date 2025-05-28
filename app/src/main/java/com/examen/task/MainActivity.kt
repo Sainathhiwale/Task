@@ -1,28 +1,38 @@
 package com.examen.task
 
 import android.os.Bundle
-import android.widget.ArrayAdapter
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.examen.task.data.model.Cars
+import com.examen.task.data.utils.Resources
 import com.examen.task.databinding.ActivityMainBinding
 import com.examen.task.presentation.adapter.CarAdapter
+import com.examen.task.presentation.viewmodel.CarViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    val TAG = "MainActivity"
     lateinit var binding: ActivityMainBinding
     lateinit var linearLayoutManager: LinearLayoutManager
     lateinit var carAdapter: CarAdapter
+    @Inject
+    lateinit var carViewModel: CarViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        initView()
+        carAPICall()
+        observeCars()
 
     }
 
 
-        val carList:MutableList<Cars> = mutableListOf(
+   /* val carList:MutableList<Cars> = mutableListOf(
             Cars(
                 id = 1,
                 name = "Tesla Model S",
@@ -65,13 +75,39 @@ class MainActivity : AppCompatActivity() {
                 price = 46999,
                 image_url = "https://example.com/images/tesla_model_3.jpg"
             )
-        )
+        )*/
 
 
-    fun initView(){
+    fun carAPICall(){
+        carViewModel.getCars()
         linearLayoutManager = LinearLayoutManager(this)
+        binding.rvCar.setHasFixedSize(true)
         binding.rvCar.layoutManager = linearLayoutManager
-        binding.rvCar.adapter = CarAdapter(carList)
+
+    }
+    // response bind to adapter
+    private fun observeCars() {
+        lifecycleScope.launch {
+            carViewModel.cars.collect {result ->
+               when(result){
+                   is Resources.Loading ->{
+                     Log.d(TAG,"Loading")
+                   }
+                   is Resources.Error ->{
+                       Log.d(TAG,"Error")
+                   }
+                   is Resources.Success -> {
+                       Log.d(TAG,"Success")
+                       result.data.let {
+                           val mutableList: MutableList<Cars?> = mutableListOf(it)
+                           binding.rvCar.adapter = CarAdapter(mutableList)
+                       }
+
+                   }
+                }
+
+            }
+        }
 
     }
 }
