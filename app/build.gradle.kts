@@ -73,4 +73,13 @@ dependencies {
     implementation(libs.core.splashscreen)
     implementation(libs.glide)
     ksp(libs.glide.compiler)
+    // unit testing lib and above added junit testing
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    //Coroutine Testing
+    testImplementation(libs.coroutines.test)
+    //LiveData + ViewModel Testing
+    testImplementation(libs.core.testing)
+    // API Testing
+    testImplementation(libs.mockwebserver)
 }
