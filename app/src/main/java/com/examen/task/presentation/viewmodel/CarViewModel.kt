@@ -1,5 +1,6 @@
 package com.examen.task.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.examen.task.data.model.Cars
@@ -18,8 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CarViewModel @Inject constructor (private val carUseCase: CarUseCase): ViewModel() {
 
-    private var _cars = MutableStateFlow<Resources<Cars>>(Resources.Loading())
-    val cars:StateFlow<Resources<Cars>> = _cars
+    private var _cars = MutableStateFlow<Resources<MutableList<Cars>>>(Resources.Loading())
+    val cars:StateFlow<Resources<MutableList<Cars>>> = _cars
 
     fun getCars() {
         viewModelScope.launch {
@@ -30,12 +31,13 @@ class CarViewModel @Inject constructor (private val carUseCase: CarUseCase): Vie
         }
     }
 
-    private fun getCarInFlow(): Flow<Resources<Cars>> = flow{
+    private fun getCarInFlow(): Flow<Resources<MutableList<Cars>>> = flow{
          emit(Resources.Loading())
           try {
               val response = withContext(Dispatchers.IO){
-                carUseCase.getCarList()
+                 carUseCase.getCarList()
               }
+              emit(Resources.Success(response))
           }catch (e:Exception){
               emit(Resources.Error(e.message.toString()))
           }

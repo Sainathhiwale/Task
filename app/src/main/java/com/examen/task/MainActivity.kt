@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.examen.task.data.model.Cars
 import com.examen.task.data.utils.Resources
 import com.examen.task.databinding.ActivityMainBinding
 import com.examen.task.presentation.adapter.CarAdapter
@@ -79,7 +78,6 @@ class MainActivity : AppCompatActivity() {
 
 
     fun carAPICall(){
-        carViewModel.getCars()
         linearLayoutManager = LinearLayoutManager(this)
         binding.rvCar.setHasFixedSize(true)
         binding.rvCar.layoutManager = linearLayoutManager
@@ -87,27 +85,32 @@ class MainActivity : AppCompatActivity() {
     }
     // response bind to adapter
     private fun observeCars() {
+        carViewModel.getCars()
         lifecycleScope.launch {
-            carViewModel.cars.collect {result ->
-               when(result){
-                   is Resources.Loading ->{
-                     Log.d(TAG,"Loading")
-                   }
-                   is Resources.Error ->{
-                       Log.d(TAG,"Error")
-                   }
-                   is Resources.Success -> {
-                       Log.d(TAG,"Success")
-                       result.data.let {
-                           val mutableList: MutableList<Cars?> = mutableListOf(it)
-                           binding.rvCar.adapter = CarAdapter(mutableList)
-                       }
+                carViewModel.cars.collect { result ->
+                    when (result) {
+                        is Resources.Loading -> {
+                            Log.d(TAG, "Loading")
+                        }
 
-                   }
+                        is Resources.Error -> {
+                            Log.d(TAG, "Error")
+                        }
+
+                        is Resources.Success -> {
+                            Log.d(TAG, "Success ${result.data}")
+                            result.data.let {
+
+                                carAdapter = CarAdapter(it)
+                                binding.rvCar.adapter = carAdapter
+
+                            }
+
+                        }
+                    }
+
                 }
-
             }
         }
 
     }
-}

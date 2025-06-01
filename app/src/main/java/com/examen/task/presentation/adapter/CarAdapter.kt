@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide
 import com.examen.task.data.model.Cars
 import com.examen.task.databinding.CarLayoutBinding
 
-class CarAdapter(private val cars: MutableList<Cars?>): RecyclerView.Adapter<CarAdapter.MyCarViewHolder>() {
+class CarAdapter(private val cars: MutableList<Cars>?): RecyclerView.Adapter<CarAdapter.MyCarViewHolder>() {
 
     class MyCarViewHolder(private val binding: CarLayoutBinding):RecyclerView.ViewHolder(binding.root){
        fun bind(cars: Cars){
@@ -27,14 +27,14 @@ class CarAdapter(private val cars: MutableList<Cars?>): RecyclerView.Adapter<Car
 
 
     override fun getItemCount(): Int {
-       return cars.size
+       return cars.orEmpty().size
     }
 
     override fun onBindViewHolder(holder: MyCarViewHolder, position: Int) {
-        val carItem = cars[position]
+        val carItem = cars?.get(position)
         carItem?.let { holder.bind(it)}
         holder.itemView.setOnClickListener {
-            cars.removeAt(position)
+            cars?.removeAt(position)
             notifyItemRemoved(position)
         }
     }
